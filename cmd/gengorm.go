@@ -1,13 +1,17 @@
 /*
 Copyright © 2024 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
 import (
 	"fmt"
 
+	"github.com/gsy/store/pkg/user/infrastructure/database"
+	"github.com/gsy/store/pkg/user/infrastructure/database/model"
 	"github.com/spf13/cobra"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gen"
+	"gorm.io/gorm"
 )
 
 // gengormCmd represents the gengorm command
@@ -22,6 +26,26 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("gengorm called")
+
+		// 1. create database via config
+		db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+		if err != nil {
+			panic(err)
+		}
+
+		// 2. create generator
+		g := gen.NewGenerator(gen.Config{
+			OutPath: "/Users/tiger/code/store/pkg/user/infrastructure/database/dal/query",
+			Mode:    gen.WithDefaultQuery,
+		})
+		g.UseDB(db)
+
+		// 3. apply & execute
+		g.ApplyBasic(model.User{})
+
+		g.ApplyInterface(func(database.UserRepository) {}, model.User{})
+
+		g.Execute()
 	},
 }
 
