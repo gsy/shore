@@ -1,6 +1,8 @@
 package user_model
 
 type User struct {
-	ID   int64
+	ID   string
 	Name string
 }
+
+func (u User) Entity() {}

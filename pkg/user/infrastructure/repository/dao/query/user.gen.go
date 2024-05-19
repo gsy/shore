@@ -6,7 +6,6 @@ package query
 
 import (
 	"context"
-	"strings"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -17,9 +16,7 @@ import (
 
 	"gorm.io/plugin/dbresolver"
 
-	"github.com/gsy/store/pkg/user/infrastructure/database/model"
-
-	user_model "github.com/gsy/store/pkg/user/domain/model"
+	"github.com/gsy/store/pkg/user/infrastructure/repository/dao/model"
 )
 
 func newUser(db *gorm.DB, opts ...gen.DOOption) user {
@@ -30,12 +27,12 @@ func newUser(db *gorm.DB, opts ...gen.DOOption) user {
 
 	tableName := _user.userDo.TableName()
 	_user.ALL = field.NewAsterisk(tableName)
-	_user.ID = field.NewUint(tableName, "id")
+	_user.ID = field.NewInt64(tableName, "id")
 	_user.CreatedAt = field.NewTime(tableName, "created_at")
 	_user.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_user.DeletedAt = field.NewField(tableName, "deleted_at")
-	_user.UserID = field.NewUint(tableName, "user_id")
-	_user.Name = field.NewString(tableName, "name")
+	_user.UserID = field.NewString(tableName, "user_id")
+	_user.Username = field.NewString(tableName, "username")
 
 	_user.fillFieldMap()
 
@@ -46,12 +43,12 @@ type user struct {
 	userDo userDo
 
 	ALL       field.Asterisk
-	ID        field.Uint
+	ID        field.Int64
 	CreatedAt field.Time
 	UpdatedAt field.Time
 	DeletedAt field.Field
-	UserID    field.Uint
-	Name      field.String
+	UserID    field.String
+	Username  field.String
 
 	fieldMap map[string]field.Expr
 }
@@ -68,12 +65,12 @@ func (u user) As(alias string) *user {
 
 func (u *user) updateTableName(table string) *user {
 	u.ALL = field.NewAsterisk(table)
-	u.ID = field.NewUint(table, "id")
+	u.ID = field.NewInt64(table, "id")
 	u.CreatedAt = field.NewTime(table, "created_at")
 	u.UpdatedAt = field.NewTime(table, "updated_at")
 	u.DeletedAt = field.NewField(table, "deleted_at")
-	u.UserID = field.NewUint(table, "user_id")
-	u.Name = field.NewString(table, "name")
+	u.UserID = field.NewString(table, "user_id")
+	u.Username = field.NewString(table, "username")
 
 	u.fillFieldMap()
 
@@ -104,7 +101,7 @@ func (u *user) fillFieldMap() {
 	u.fieldMap["updated_at"] = u.UpdatedAt
 	u.fieldMap["deleted_at"] = u.DeletedAt
 	u.fieldMap["user_id"] = u.UserID
-	u.fieldMap["name"] = u.Name
+	u.fieldMap["username"] = u.Username
 }
 
 func (u user) clone(db *gorm.DB) user {
@@ -118,22 +115,6 @@ func (u user) replaceDB(db *gorm.DB) user {
 }
 
 type userDo struct{ gen.DO }
-
-// insert into user (`user_id`, `name`) values (@user.id, @user.name)
-func (u userDo) CreateUser(user user_model.User) (err error) {
-	var params []interface{}
-
-	var generateSQL strings.Builder
-	params = append(params, user.id)
-	params = append(params, user.name)
-	generateSQL.WriteString("insert into user (`user_id`, `name`) values (?, ?) ")
-
-	var executeSQL *gorm.DB
-	executeSQL = u.UnderlyingDB().Exec(generateSQL.String(), params...) // ignore_security_alert
-	err = executeSQL.Error
-
-	return
-}
 
 func (u userDo) Debug() *userDo {
 	return u.withDO(u.DO.Debug())

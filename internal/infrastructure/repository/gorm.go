@@ -14,19 +14,19 @@ type Convertor[M Model, E domain.Entity] interface {
 	ToEntity(model *M) (entity *E)
 }
 
-func NewRepository[M Model, E domain.Entity](db *gorm.DB, conv Convertor[M, E]) *repositoryImpl[M, E] {
-	return &repositoryImpl[M, E]{
+func NewRepository[M Model, E domain.Entity](db *gorm.DB, conv Convertor[M, E]) *GeneralRepository[M, E] {
+	return &GeneralRepository[M, E]{
 		db:   db,
 		conv: conv,
 	}
 }
 
-type repositoryImpl[M Model, E domain.Entity] struct {
+type GeneralRepository[M Model, E domain.Entity] struct {
 	db   *gorm.DB
 	conv Convertor[M, E]
 }
 
-func (repo *repositoryImpl[M, E]) Create(ctx context.Context, entity *E) (result *E, err error) {
+func (repo *GeneralRepository[M, E]) Create(ctx context.Context, entity *E) (result *E, err error) {
 	model := repo.conv.FromEntity(entity)
 	if err = repo.db.WithContext(ctx).Create(model).Error; err != nil {
 		return nil, err

@@ -1,8 +1,8 @@
 package command
 
 import (
-	"github.com/gsy/store/pkg/user/infrastructure/database"
-	"github.com/gsy/store/pkg/user/infrastructure/database/model"
+	"github.com/gsy/store/pkg/user/infrastructure/repository"
+	"github.com/gsy/store/pkg/user/infrastructure/repository/model"
 	"github.com/spf13/cobra"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gen"
