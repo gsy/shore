@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v6"
-	user_model "github.com/gsy/store/pkg/user/domain/model"
+	user_model "github.com/gsy/store/pkg/user/domain/user"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gorm.io/driver/mysql"

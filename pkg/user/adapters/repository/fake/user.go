@@ -1,6 +1,5 @@
 package fake
 
-import user_model "github.com/gsy/store/pkg/user/domain/model"
 
 type UserRepository struct {
 	users []user_model.User
